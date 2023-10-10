@@ -18,6 +18,8 @@ namespace kotlins.Service.Implements
         public async Task<IEnumerable<Produto>> GetAll()
         {
             return await _context.Produtos
+               .AsNoTracking()
+               .Include(p => p.Categoria)
                .ToListAsync();
         }
 
@@ -26,6 +28,7 @@ namespace kotlins.Service.Implements
             try
             {
                 var Resposta = await _context.Produtos
+                    .Include(p => p.Categoria)
                     .FirstAsync(i => i.id == id);
 
                 return Resposta;
@@ -38,6 +41,7 @@ namespace kotlins.Service.Implements
         public async Task<IEnumerable<Produto>> GetByNome(string nome)
         {
             var Produto = await _context.Produtos
+              .Include(p => p.Categoria)
               .Where(p => p.Nome.Contains(nome))
               .ToListAsync();
 
@@ -47,6 +51,7 @@ namespace kotlins.Service.Implements
         public async Task<IEnumerable<Produto>> GetByPreco(decimal preco)
         {
                var produto = await _context.Produtos
+               .Include(p => p.Categoria)
                .Where(p => p.Preco == preco)
                .ToListAsync();
 
@@ -57,9 +62,9 @@ namespace kotlins.Service.Implements
         {
             {
                var Produto = await _context.Produtos
-             
-              .Where(p => p.Marca.Contains(marca))
-              .ToListAsync();
+               .Include(p => p.Categoria)
+               .Where(p => p.Marca.Contains(marca))
+               .ToListAsync();
 
                 return Produto;
             };
@@ -68,6 +73,15 @@ namespace kotlins.Service.Implements
         
         public async Task<Produto?> Create(Produto produto)
         {
+            if (produto.Categoria is not null)
+            {
+                var BuscarCategoria = await _context.Categorias.FindAsync(produto.Categoria.id);
+
+                if (BuscarCategoria is null)
+                    return null;
+            }
+
+            produto.Categoria = produto.Categoria is not null ? _context.Categorias.FirstOrDefault(c => c.id == produto.Categoria.id) : null;
 
             await _context.Produtos.AddAsync(produto);
             await _context.SaveChangesAsync();
@@ -83,10 +97,18 @@ namespace kotlins.Service.Implements
             if (ProdutoUpdate is null)
                 return null;
 
+            if (produto.Categoria is not null)
+            {
+                var buscaCategoria = await _context.Categorias.FindAsync(produto.Categoria.id);
+
+                if (buscaCategoria == null)
+                    return null;
+            }
+
+            produto.Categoria = produto.Categoria is not null ? _context.Categorias.FirstOrDefault(c => c.id == produto.Categoria.id) : null;
+
             _context.Entry(ProdutoUpdate).State = EntityState.Detached;
-
             _context.Entry(produto).State = EntityState.Modified;
-
             await _context.SaveChangesAsync();
 
             return produto;

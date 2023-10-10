@@ -17,7 +17,10 @@ namespace kotlins
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -31,8 +34,12 @@ namespace kotlins
             // Validação das Entidades
             builder.Services.AddTransient<IValidator<Produto>, ProdutoValidator>();
 
+            builder.Services.AddTransient<IValidator<Categoria>, CategoriaValidator>();
+
             // Registrar as Classes e Interfaces Service
             builder.Services.AddScoped<IProdutoService, ProdutoService>();
+
+            builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 
             //Configuração do CORS
 

@@ -19,14 +19,12 @@ namespace kotlins.Model
         public string Marca { get; set; } = string.Empty;
 
         [Column(TypeName = "varchar")]
-        [StringLength(255)]
+        [StringLength(1000)]
         public string Descricao { get; set; } = string.Empty;
 
         [Column(TypeName = "Decimal(6,2)")]
         public decimal Preco { get; set; }
 
-        [Column(TypeName = "Varchar")]
-        [StringLength(5000)]
-        public string Foto { get; set; } = string.Empty;
+        public virtual Categoria? Categoria { get; set; }
     }
 }

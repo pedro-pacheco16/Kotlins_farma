@@ -19,9 +19,8 @@ namespace kotlins.Validator
 
             RuleFor(p => p.Descricao)
                     .NotEmpty()
-                    .MinimumLength(5)
-                    .MaximumLength(255);
-
+                    .MinimumLength(10)
+                    .MaximumLength(1000);
 
             RuleFor(p => p.Preco)
                     .NotEmpty();
